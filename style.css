@@ -1,0 +1,672 @@
+
+
+
+html{
+
+  /* declare color variables*/
+  --primary-bg-color: rgb(23,23,23);
+  --secondary-bg-color: rgb(28,28,28);
+  --active-bg-color: rgb(67,69,71);
+  --inactive-bg-color: rgb(47,49,51);
+  --active-tab-color: rgb(33,33,33);
+  --axis-color: rgb(175, 180, 180);
+  --high-emph-txt: rgba(255,255,255,0.87);
+  --med-emph-txt: rgba(255,255,255,0.72);
+  --low-emph-txt: rgba(255,255,255,0.38);
+  --matrix-top: 50px;
+  --matrix-left: 430px;
+  --matrix-height: 650px;
+  --matrix-header-top: 25px;
+  --body-width: 1330px;
+  --mask-buffer: 100px;
+  height: 1850px;
+  max-height: 1850px;
+}
+
+body{
+  background-color: var(--primary-bg-color);
+  color: var(--high-emph-txt);
+  margin: 0px auto 30px auto;
+  padding-bottom: 20px;
+  width: var(--body-width);
+  max-width: var(--body-width);
+  max-height: 1850px;
+  position: relative;
+  font-family: "Arial", sans-serif;
+  font-weight: 100;
+  -webkit-font-smoothing: antialiased;
+  top: 0px;
+  display: block;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+#nav-container-outer{
+  position: relative;
+  width: 100%;
+  height: 35px;
+  background-color: var(--primary-bg-color);
+}
+#nav-container-inner{
+  position: relative;
+  width: 200%;
+  height: 35px;
+  background-color: var(--inactive-bg-color);
+}
+#nav-container-outer a{
+  position: relative;
+  display: inline-block;
+  margin: 12px 30px 0px 0px;
+  color: var(--med-emph-txt);
+  left: var(--matrix-left);
+  text-decoration: none;
+}
+
+h1{
+  margin: 10px 0px 10px 0px;
+  position: relative;
+  left: var(--matrix-left);
+  font-size: 50px;
+  color: var(--high-emph-txt)
+}
+h2{
+  color: var(--high-emph-txt);
+}
+h3{
+  margin-bottom: 0.5em;
+}
+ol{
+  color: var(--med-emph-txt);
+}
+hr{
+  border: 1px solid var(--low-emph-txt)
+}
+a.active-link{
+  color: rgb(170,170,255);
+}
+a.inactive-link{
+  color: var(--med-emph-txt);
+}
+div .disabled{
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+
+#instructions{
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  width: 200px;
+  font-size: 14px;
+}
+#matrix-header{
+  width: var(--matrix-height);
+  height: 20px;
+  position: absolute;
+  top: var(--matrix-header-top);
+  left: var(--matrix-left);
+}
+#matrix-header select{
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 130px;
+}
+#matrix-header span{
+  position: absolute;
+  bottom: 0px;
+  right: 140px;
+  font-size: 16px;
+}
+#clear-selections{
+  position: absolute;
+  bottom: 0px;
+  display: block;
+  padding: 5px;
+  float: right;
+  border: 1px solid black;
+  width: 120px;
+  height: 8px;
+  text-align: center;
+  line-height: 8px;
+  font-size: 12px;
+}
+
+
+
+#colorbar{
+  position: absolute;
+  right: 150px;
+  top: 290px;
+}
+
+select{
+  margin-left: 10px;
+  background-color: var(--secondary-bg-color);
+  color: var(--med-emph-txt);
+  font-size: 15px;
+}
+textarea{
+  width: 100%;
+  resize: none;
+  overflow-y: scroll;
+}
+textarea::-webkit-scrollbar{
+  background-color: var(--inactive-tab-color);
+  width: 8px;
+}
+textarea:-webkit-scrollbar-thumb{
+  background: var(--active-bg-color);
+}
+select:focus, textarea:focus{
+  outline: none;
+}
+
+th p, th span, td p, td span{
+  margin: 0px;
+  padding: 0px;
+  font-size: 16px;
+  font-weight: 100;
+  fill: var(--med-emph-txt);
+}
+th, td{
+  padding: 15px 20px 0px 0px;
+  text-align: left;
+  vertical-align: top;
+}
+
+svg{
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  shape-rendering: crispEdges;
+}
+
+#matrix-div, svg, .buttons div, .scroll-table td{
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+     -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+          user-select: none; /* Non-prefixed version, currently
+                                supported by Chrome, Opera and Firefox */
+}
+#svg-container{
+  width: var(--matrix-height);
+  height: var(--matrix-height);
+  position: absolute;
+  left: var(--matrix-left);
+  top: var(--matrix-top);
+}
+#matrix-svg{
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+#matrix-mask-svg{
+  position: absolute;
+  left: calc(var(--matrix-left) - calc(var(--mask-buffer) / 2)); 
+  top: calc(var(--matrix-top) - calc(var(--mask-buffer) / 2));
+  width: calc(var(--matrix-height) + var(--mask-buffer));
+  height: calc(var(--matrix-height) + var(--mask-buffer));
+}
+#matrix-mouseout-mask{
+  width: calc(var(--matrix-height) + var(--mask-buffer));
+  height: calc(var(--matrix-height) + var(--mask-buffer));
+  fill: transparent;
+}
+.matrix-rect{
+  stroke-opacity: 0;
+  stroke-width: 0;
+}
+
+#apriori-rect-parent{
+  position: absolute;
+  left: 420px;
+  top: var(--matrix-top);
+  width: 8px;
+  height: var(--matrix-height);
+}
+.apriori-rect{
+  display: block;
+  width: 8px;
+  border: 0px solid transparent;
+  padding: 0px;
+}
+.scatter-plot{
+  float: right;
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+}
+
+.scatter-plot text{
+  fill: var(--med-emph-txt);
+  font-size: 11px;
+}
+.scatter-plot path{
+  stroke: #000000;
+}
+.scatter-dot{
+  fill: rgb(200,200,200);
+}
+
+.scatter-axes{
+  max-width: 200px;
+  max-height: 200px;
+}
+
+.mouseover-textbox{
+  height: 55px;
+  fill: rgb(200,200,220);
+  stroke: rgb(0,0,0);
+  stroke-width: 1px;
+  fill-opacity: 0.75;
+}
+
+.background-rect{
+  fill: rgb(0, 0, 0);
+  stroke: #000000;
+  stroke-width: 1px;
+}
+
+#hover-rect{
+  fill-opacity: 0;
+  stroke: rgb(0,255,0);
+  stroke-opacity: 1;
+  stroke-width: 1.5;
+  pointer-events: none;
+}
+
+#qselections{
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 185px;
+  color: var(--med-emph-txt);
+}
+#qselections h2, h3{
+  position: relative;
+  left: 0px;
+  top: 0px;
+  width: 170px;
+}
+#qselection-arrow.on{
+  width: 0; 
+  height: 0;
+  margin: 0px;
+  padding: 0px;
+  border-left: none;
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+  border-right:10px solid var(--low-emph-txt);
+  position: absolute;
+  top: 800px;
+}
+.qselection-color-tab{
+  display: inline-block;
+  height: 23px;
+  width: 7px;
+  border: 1px solid black;
+}
+.circle{
+  display: inline-block;
+  left: 0px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50px;
+  margin-bottom: 7px;
+  vertical-align: middle;
+}
+
+#behavior-selection-div{
+  position: relative;
+  top: 0px;
+}
+#behavior-selection-div div,
+#assay-selection-div div{
+  font-size: 14px;
+  text-align: center;
+  margin: 3px 0px 3px 0px;
+  padding: 3px 0px 3px 0px;
+  border: 1px solid black;
+  width: 170px;
+  height: 17px;
+  line-height: 17px;
+}
+
+#qselections div.inactive{
+  background-color: var(--inactive-bg-color);
+}
+
+#qselections div.active{
+  background-color: var(--active-bg-color);
+}
+
+#qselections div.selected{
+  background-color: var(--active-bg-color);
+  -webkit-box-shadow: inset 0px 0px 5px rgb(50,50,50);
+  box-shadow: inset 0px 0px 5px rgb(50,50,50);
+}
+
+#metric-select-parent{
+  position: absolute;
+  left: 190px;
+  top: 0px;
+  width: 212px;
+  height: 675px;
+}
+#metric-select-buttons{
+  position: absolute;
+  top: var(--matrix-header-top);
+  right: 0px;
+}
+#metric-select-buttons div{
+  margin-left: 3px;
+  display: block;
+  padding: 5px;
+  float: right;
+  border: 1px solid black;
+  width: 86px;
+  height: 8px;
+  text-align: center;
+  line-height: 8px;
+  font-size: 12px;
+}
+.buttons div, .buttons input{
+  margin: 5px 0px 5px 5px;
+  padding: 5px;
+  display: inline-block;
+  border: 1px solid black;
+  width: 86px;
+  height: 8px;
+  text-align: center;
+  line-height: 8px;
+  font-size: 12px;
+}
+#metric-select-buttons div.inactive,
+#clear-selections.inactive,
+.buttons div.inactive,
+.buttons input.inactive{
+  background-color: var(--inactive-bg-color);
+}
+#metric-select-buttons div.active,
+#clear-selections.active,
+.buttons div.active,
+.buttons input.active{
+  background-color: var(--active-bg-color);
+}
+#metric-select-buttons div.selected,
+#clear-selections.selected,
+.buttons div.selected{
+  background-color: rgb(200,200,200);
+  -webkit-box-shadow: inset 0px 0px 5px rgb(100,100,100);
+  box-shadow: inset 0px 0px 5px rgb(100,100,100);
+}
+
+#metric-selection-scroll-par{
+  position: absolute;
+  top: var(--matrix-top);
+  right: 0px;
+  height: 618px;
+  width: 100%;
+  width: 200px;
+  color: var(--med-emph-txt);
+  padding: 25px 0px 5px 5px;
+  background-color: var(--secondary-bg-color);
+  border: 1px solid black;
+}
+#metric-selections{
+  overflow: hidden;
+  overflow-y: scroll;
+  scrollbar-color: var(--active-bg-color) var(--inactive-tab-color);
+  scrollbar-width: 8px;
+  height: 100%;
+  padding-right: 5px;
+}
+#metric-selections-shift-click-instuct{
+  width: 100%;
+  font-size: 10.5px;
+  position: absolute;
+  top: 58px;
+  background-color: rgba(0,0,0,0);
+  color: var(--high-emph-txt);
+  padding-left: 16px;
+}
+.scroll-div{
+  color: var(--med-emph-txt);
+  padding: 5px;
+  background-color: var(--secondary-bg-color);
+  border: 1px solid black;
+  overflow: hidden;
+  overflow-y: scroll;
+  scrollbar-color: var(--active-bg-color) var(--inactive-tab-color);
+  scrollbar-width: 8px;
+}
+.scroll-div::-webkit-scrollbar,
+#metric-selections::-webkit-scrollbar{
+  background-color: var(--inactive-tab-color);
+  width: 8px;
+}
+.scroll-div::-webkit-scrollbar-thumb,
+#metric-selections::-webkit-scrollbar-thumb{
+  background: var(--active-bg-color);
+}
+
+.scroll-div div,
+#metric-selections div{
+  border: 1px solid transparent;
+  font-size: 12px;
+  padding: 0px 0px 0px 5px;
+  cursor: default;
+}
+.scroll-div div.inactive,
+#metric-selections div.inactive{
+  color: var(--low-emph-txt);
+  background-color: none;
+}
+.scroll-div div.active,
+#metric-selections div.active{
+  color: var(--med-emph-txt);
+  background-color: var(--inactive-bg-color);
+}
+
+.tab-parent{
+  border: 1px solid black;
+  border-top: none;
+  display: block;
+  width: 100%;
+  height: 900px;
+  position: absolute;
+  background-color: var(--active-tab-color);
+}
+
+#tab-div li{
+  position: relative;
+  display: inline-block;
+  margin: 0px;
+  padding: 0 40px 0 20px;
+  width: auto;
+  height: 30px;
+  border-style: solid;
+  border-color: black;
+  border-width: 1px 1px 1px 1px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  text-align: left;
+  line-height: 30px;
+  cursor: pointer;
+  z-index: 0;
+}
+#tab-div li.active{
+  background-color: var(--active-tab-color);
+  border-bottom: 1px solid var(--active-tab-color);
+}
+#tab-div li.inactive{
+  background-color: var(--secondary-bg-color);
+  border-bottom: none;
+}
+
+#tab-header span,
+#tab-header select,
+#tab-header h2{
+  display: inline-block;
+  height: auto;
+  margin: 20px 10px 0px 10px;
+}
+#tab-header select:focus{
+  outline: none;
+}
+
+.tab-content{
+  margin: 20px;
+  display: block;
+  height: auto;
+}
+#metric-loadings-tab div.tab-content{
+  overflow: hidden;
+  overflow-x: scroll;
+  white-space: nowrap;
+}
+.tab-content::-webkit-scrollbar{
+  background-color: var(--secondary-bg-color);
+  width: 8px;
+}
+.tab-content::-webkit-scrollbar-thumb{
+  background: var(--active-bg-color);
+}
+
+.y-axis text{
+  fill: var(--med-emph-txt);
+  font-size: 10px;
+}
+.axis text{
+  fill: var(--med-emph-txt);
+  font-size: 10px;
+}
+.axis line{
+  stroke: #000000;
+}
+.axis path{
+  stroke: #000000;
+}
+
+.loadings-svg{
+  display: inline;
+  padding: 10px;
+}
+.pval-svg{
+  display: inline;
+  padding: 10px;
+}
+
+#metric-summary-plot-div{
+  width: 40%;
+  height: auto;
+  float: right;
+  margin-top: 15px;
+  margin-right: 50px;
+}
+
+.scroll-table{
+  table-layout: fixed;
+  margin-top: 10px;
+  width: 100%;
+  height: 400px;
+  max-height: 400px;
+  border-collapse: collapse;
+  overflow-y: hidden;
+  display: block;
+}
+.scroll-table tbody{
+  position: relative;
+  top: 0px;
+  bottom: 0px;
+  display: block;
+  height: 369px;
+  width: auto;
+  overflow: hidden;
+  overflow-y: scroll;
+  scrollbar-color: var(--active-bg-color) #000000;
+  scrollbar-width: 8px;
+}
+.scroll-table tbody.active::-webkit-scrollbar{
+  background-color: var(--primary-bg-color);
+  width: 8px;
+}
+.scroll-table tbody.inactive::-webkit-scrollbar{
+  background-color: rbg(255,0,0);
+  width: 8px;
+}
+.scroll-table tbody::-webkit-scrollbar-thumb{
+  background: var(--active-bg-color);
+}
+.scroll-table tr{
+  width: 100%;
+  display: block;
+}
+.scroll-table th{
+  background-color: var(--active-bg-color);
+}
+.scroll-table td,
+.scroll-table th{
+  color: var(--med-emph-txt);
+  height: 6px;
+  padding: 2px 2px 1px 2px;
+  border: 0.5px solid rgb(60,60,60);
+  text-align: left;
+  vertical-align: top;
+  font-size: 10px;
+  font-weight: 100;
+}
+.scroll-table td.active{
+  color: var(--high-emph-txt);
+  background-color: rgb(50,50,50);
+}
+.scroll-table td.inactive{
+  color: var(--med-emph-txt);
+  background-color: var(--secondary-bg-color);
+}
+
+.behavior-gene-input{
+  display: inline-block;
+  width: 200px;
+  margin: 0px;
+  color: var(--med-emph-txt);
+  background-color: var(--secondary-bg-color);
+  border: 1px solid var(--low-emph-txt);
+}
+.behavior-gene-input:focus{
+  outline: none;
+}
+
+.notification{
+  position: absolute;
+  fill: rgb(30,150,20);
+  height: 15px;
+  width: 15px;
+  cx: 7.5;
+  cy: 7.5;
+  r: 7px;
+  shape-rendering: geometricPrecision;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  width: 120px;
+  background-color: rbga(255,255,255,0.3);
+  color: #000;
+  text-align: center;
+  padding: 5px 0;
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+

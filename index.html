@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta property="og:title" content="Decathlon Data Browser">
+        <meta name="author" content="Zach Werkhoven">
+        <meta property="og:locale" content="en_US">
+        <meta property="og:type" content="website">
+        <meta property="og:description" content="Interactive data browser for the Decathlon study of individual behavioral covariation within a genotype of the fruit fly D. melanogaster.">
+        <meta property="og:image" content="http://decathlon.debivort.org/ddb_prev_lg.png">
+        <meta name="article-published_time" property="article:published_time" content="2020-11-17T00:00:00-0600">
+        <meta name="article-modified_time" property="article:modified_time" content="2020-11-17T13:47:16-0600">
+        <meta name="publish_date" property="og:publish_date" content="2020-11-17T00:00:00-0600"> 
+        <title>Decathlon Data Browser</title>
+        <link rel="stylesheet" href="style.css">
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script type="text/javascript" src="js/utils.js"></script>
+        <script type="text/javascript" src="js/matrix.js" defer></script>
+        <script type="text/javascript" src="js/scatter_plot.js" defer></script>
+        <script type="text/javascript" src="js/behavior_loadings.js" defer></script>
+        <script type="text/javascript" src="js/behavior_summary.js" defer></script>
+        <script type="text/javascript" src="js/gene_search.js" defer></script>
+        <script type="text/javascript" src="js/kegg_pathways.js" defer></script>
+        <script type="text/javascript" src="js/behavior_gene_lists.js" defer></script>
+        <script type="text/javascript" src="js/tabs.js" defer></script>
+        <script type="text/javascript" src="js/main.js" defer></script>
+    </head>
+    <body style="height: 100%">
+        <nav id="nav-container-outer" style="font-family: Arial, sans-serif; font-weight: 100; font-size: 16px; line-height: 20px">
+            <a href="./">Browser</a>
+            <a href="./documentation" target="_blank">Documentation</a>
+            <a href="https://doi.org/10.5281/zenodo.4110049" target="_blank">Download Data</a>
+            <a href="https://www.biorxiv.org/content/10.1101/779363v1.full" target="_blank">Original Publication</a>
+            <a>About</a>
+            <hr style="border: 1px solid #6d6d6d; height: 0px; margin: 0.5em 0em 0.5em 0em">
+        </nav>
+        <div style="position: relative; margin-top: 30px">
+            <h1>Decathlon data browser</h1>
+        </div>
+        <div id="matrix-div" style="position: relative; width: auto; height: 740px">
+            <div id="mask-container"></div>
+            <aside id="qselections">
+                <!--<h2 style="margin-top: 0px"><u>Quick Selections</u></h2>-->
+                <h3>Behavior Groups</h3>
+                <div id="behavior-selection-div"></div>
+                <h3>Assays</h3>
+                <div id="assay-selection-div"></div>
+            </aside>
+            <div id="metric-select-parent">
+                <div id="metric-select-buttons">
+                    <div class="inactive">Select Group</div>
+                    <div class="inactive">Deselect Group</div>
+                </div>
+                <div id="metric-selection-scroll-par">
+                    <div id="metric-selections"></div>
+                </div>
+                <div id="metric-selections-shift-click-instuct">
+                    <i><b>shift-click</b> to select a range of behaviors</i>
+                </div>
+            </div>
+            <div id="matrix-header">
+                <span>Select dataset:</span>
+                <select></select>
+                <div id="clear-selections" class="inactive">Clear All Selections</div>
+            </div>
+            <aside id="instructions">
+                <h2 style="margin-top: 0px"><u>Instructions</u></h2>
+                <ol style="padding-left: 0px; margin-top: 15px; font-size: 12px;">
+                    <li>Individual elements in the matrix 
+                        correspond to the pairwise correlations between 
+                        behaviors.
+                    </li>
+                    <li>
+                        <b><i>Click + drag</i></b> or <b><i>Ctrl-click+drag</i></b>
+                        in the matrix or use the <b>Behavior Groups</b> and <b>Assays</b> 
+                        quick selection groupings to select/deselect behaviors.
+                    </li>
+                    <li>
+                        Left-click individual elements to see scatter plots of the
+                        individual behavior pairs.
+                    </li>
+                    <li>
+                        Explore various features of selected behaviors via the tabs below.
+                    </li>
+                </ol>
+            </aside>
+            <div id="colorbar"></div>
+            <div id="svg-container"></div>
+        </div>
+        <div id="tab-div" style="width: auto; height: 800px; overflow: hidden">
+            <ul style="width: 100%; height: 31px; margin: 0; padding: 0; border-bottom: 1px solid black;">
+                <li class="active">Behavior Loadings</li
+                ><li class="inactive">Behavior Summary</li
+                ><li class="inactive">Select Genes by Behavior</li
+                ><li class="inactive">Search by Gene ID</li
+                ><li class="inactive">KEGG Pathways</li>
+            </ul>
+            <div class="tab-parent" id="metric-loadings-tab">
+                <div id="tab-header" style="margin-left: 70px">
+                    <div style="display: inline-block">
+                        <div style="display: block">
+                            <span style="margin-right: -10px; display: inline-block">Behavior group:</span>
+                            <select style="display: inline-block"></select>
+                        </div>
+                        <div id="loadings-select-buttons" class="buttons" style="display: block; margin-top: 10px">
+                            <div class="inactive" style="display: inline-block">Deselect Group</div>
+                            <div class="inactive" style="display: inline-block">Select Group</div>
+                        </div>
+                    </div>
+                    <div style="position: absolute; -webkit-transform: translate(-50%, 0); left: 662px; top: 0px"> 
+                        <h2 style="text-anchor: middle">Activity PC</h2>
+                        <svg style="display: inline-block; vertical-align: bottom">
+                            <rect id="loadings-color-tab" class="qselection-color-tab" style="fill: rgb(255,0,195)"></rect>
+                        </svg>
+                    </div>
+                </div>
+                <div class="tab-content"></div>
+            </div>
+            <div class="tab-parent" id="metric-summary-tab" style="visibility: hidden">
+                <div class="tab-content">
+                    <div style="margin: 40px 50px 0px 50px">
+                        <h2>Behavior Summary</h2>
+                        <hr style="border: 1px solid #6d6d6d">
+                        <div display="inline-block" style="width: 50%; height: 100%; margin: 0px; float: left">
+                            <table style="width: 100%; height: 100%">
+                                <tr>
+                                    <th colspan="2" style="width: 100%; height: auto">
+                                        <span>Select Behavior: &nbsp;</span>
+                                        <select id="metric-summary-tab-select" style="margin: 20px 0px 20px 0px; padding: 0px;"></select>
+                                    </th>
+                                </tr>
+                            </table>
+                        </div>
+                        <div id="metric-summary-plot-div" style="overflow: hidden; max-height: 800px">
+                            <div id="hist-div">
+                            </div>
+                            <div id="scree-plot">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-parent" id="behavior-gene-lists-tab" style="visibility: hidden">
+                    <div class="tab-content">
+                        <div style="margin: 40px 50px 0px 50px">
+                            <h2>Select Genes by Behavior</h2>
+                            <hr>
+                            <p style="margin-bottom: 40px">Browse lists of genes correlated to one or more behaviors. 
+                                Create a selection of genes manually or automatically using a <i>p</i>-value threshold.
+                                Set the scope of the threshold, clear, and append buttons to apply those operations to 1) this behavior - the behavior 
+                                currently selected from the dropdown menu 2) selected behaviors - the behaviors selected in the correlation matrix 
+                                or 3) all behaviors. 
+                                Once the selection is complete, "Append Selected Genes" to add the selected genes to the 
+                                "Search Genes by Gene ID" input and run a search.
+                            </p>
+                            <div style="display: inline-block; width: 30%; vertical-align: top">
+                                <div style="display: block; margin-bottom: 20px">
+                                    <label for="behavior-gene-dropdown" style="display: inline-block; width: 130px">Select Behavior:</label>
+                                    <select id="behavior-gene-dropdown" class="behavior-gene-input"></select>
+                                </div>
+                                
+                                <div style="display: block; margin-bottom: 20px; height: auto; width: auto">
+                                    <p>Apply operations to:</p>
+                                    <div style="margin-left: 30px">
+                                        <input id="pval-thresh-radiobutton-single" name="thresh-type" type="radio" value="single" checked></input>
+                                        <label for="pval-thresh-radiobutton-single">this behavior</label>
+                                    </div>
+                                    <div style="margin-left: 30px">
+                                        <input id="pval-thresh-radiobutton-selected" name="thresh-type" type="radio" value="selected"></input>
+                                        <label for="pval-thresh-radiobutton-selected">selected behaviors</label>
+                                    </div>
+                                    <div style="margin-left: 30px">
+                                        <input id="pval-thresh-radiobutton-all" name="thresh-type" type="radio" value="all"></input>
+                                        <label for="pval-thresh-radiobutton-all">all behaviors</label>
+                                    </div>
+                                </div>
+                                <div style="display: block; margin-bottom: 20px">
+                                        <label for="pval-thresh-textbox" style="display: inline-block; width: 130px"><i>p</i>-value threshold:</label>
+                                        <input id="pval-thresh-textbox" type="text" class="behavior-gene-input" style="width: 50px" value="0.05"></input>
+                                </div>
+                                <div class="buttons" style="position: relative">
+                                    <div id="pval-thresh-button" class="inactive" style="width: 150px; margin-left: 10px">Apply Threshold</div>
+                                </div>
+                            </div>
+                            <div style="display: inline-block; width: 40%; height: 550px; overflow: hidden; margin: 1px; padding: 0px 0px 0px 65px; position: relative;">
+                                    <div style="display: block; height: 30px; position: relative;">
+                                        <p style="position: absolute; bottom: 2px; margin: 0px; font-weight: 500">Gene List</p>
+                                        <div class="buttons" style="position: absolute; right: 0px; bottom: 2px">
+                                            <div id="behavior-gene-list-clear" class="inactive" style="width: 50px; margin: 0px; vertical-align: bottom">
+                                                Clear
+                                            </div>
+                                            <div id="behavior-gene-list-append" class="inactive" style="width: 140px; margin: 0px; vertical-align: bottom">
+                                                Append Selected Genes
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr style="margin: 0px;">
+                                    <div style="font-weight: 100; display: inline-block; width: 100%; position: relative">
+                                        
+                                    <table id="behavior-gene-list-table" class="scroll-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Symbol</th>
+                                                <th>FlyBase</th>
+                                                <th>KEGG</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                    <table>
+                                        <th style="font-weight: 100">Total genes in selection:</th>
+                                        <th id="num-genes-in-selection" style="font-weight: 100">0</th>
+                                    </table>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <div class="tab-parent" id="gene-search-tab" style="visibility: hidden">
+                <div class="tab-content">
+                    <div style="margin: 40px 50px 0px 50px">
+                        <h2>Search by Gene ID</h2>
+                        <hr>
+                        <p>
+                            Search genes by entering a valid gene identifiers (Gene Symbol, FlyBase gene number, or KEGG-ID) into the box below.
+                            For example, to search for Notch enter: "N", "FBgn0004647", or "Dmel_CG3936".
+                            To search multiple entries simultaneously, separate identifiers by a space or newline (no commas or other delimiters). 
+                        </p>
+                        <p style="margin-bottom: 40px">
+                            Create a new behavioral selection from behaviors correlated (<i>p</i> &lt; 0.05) to one or more of the queried genes by clicking 
+                            "Select Correlated Behaviors".
+                        </p>
+                        <div style="display: block; margin-bottom: 20px">
+                            <label for="batch-select-dropdown" style="display: inline-block">Select batch:</label>
+                            <select id="batch-select-dropdown" style="display: inline-block"></select>
+                        </div>
+                        <div style="display: inline-block; width: 20%; vertical-align: top">
+                            <div>
+                                <div class="buttons" style="width: 100%; position: relative">
+                                    <label for="gene-search-textbox" style="position: relative; left: 0px">Enter gene identifier(s):</label>
+                                    <div class="inactive" id="gene-search-clear" style="width: 40px; margin: 0; 
+                                    position: relative; bottom: 2px; left: 13px">Clear</div>
+                                </div>
+                                <textarea id="gene-search-textbox" class="scroll-div" placeholder="Gene ID"
+                                rows="8" spellcheck="false" style="width: 224px; font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;"></textarea>
+                                <div class="buttons" style="width: 100%; text-align: right">
+                                    <form id="import-form" method="POST" enctype="multipart/form-data" style="visibility: hidden; width: 0px; height: 0px">
+                                        <input id='fileid' type='file' name='filename' style="width: 0px; margin: 0px; padding: 0px; visibility: hidden"/>
+                                    </form>
+                                    <div class="inactive" id="gene-search-import" style="width: 80px">Import File</div>
+                                    <div class="inactive" id="gene-search-submit" style="width: 50px">Submit</div>
+                                </div>
+                                
+                                <label for="gene-result-textbox" style="display: block; margin-top: 20px">Valid matching identifier(s):</label>
+                                <div id="gene-result-textbox" class="scroll-div" style="height: 300px; width: 224px; 
+                                font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;">
+                                </div>
+                                <div class="buttons" style="position: relative; text-align: right">
+                                    <div id="genes-metric-button" class="inactive" style="height: 10px; width: 160px; margin-top: 10px">
+                                        Select Correlated Behaviors
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: inline-block; width: 40%; vertical-align: top; padding: 0px 30px 0px 65px">
+                                <p style="margin: 0px; font-weight: 500">Summary</p>
+                                <hr style="margin: 0px;">
+                                <table style="font-size: 14px">
+                                </table>
+                        </div>
+                        <div style="float: right">
+                            <div id="gene-search-results-div" style="display: block">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-parent" id="enrichment-tab" style="visibility: hidden">
+                    <div class="tab-content">
+                        <div style="margin: 40px 50px 0px 50px">
+                            <h2>KEGG Pathways</h2>
+                            <hr>
+                            <p style="margin-bottom: 20px">Select a KEGG pathway significantly enriched in the decathlon screen from the dropdown menu.
+                                <i>Left click</i> individual rows of the gene tables to select/deselect genes or 
+                                <i>Shift-click</i> a range of rows to select/deselect a range of genes. 
+                                <i>Append Selected Genes</i> to add selected genes to the "Search by Gene ID" input.</p>
+                            <div style="display: inline-block; width: 40%; vertical-align: top">
+                                <table style="width: 100%; height: 100%">
+                                    <tr>
+                                        <th colspan="2" style="width: 100%; height: auto">
+                                            <span>Select category: &nbsp;</span>
+                                            <select id="enrichment-tab-select" style="margin: 0px 0px 20px 0px; padding: 0px;"></select>
+                                        </th>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div style="display: block; width: 100%; padding: 10px 0px 0px 0px; height: 450px; overflow: hidden">
+                                <table id='enrichment-tab-parent-table' style="width: 100%; height: 100%">
+                                    <tr>
+                                        <th style="width: 200px">
+                                            <div style="font-weight: 100; display: inline-block; width: 100%; position: relative">
+                                                Behaviors:
+                                                <div class="buttons" style="position: absolute; right: 12px; top: 0px">
+                                                    <div id="view-metric-summary" class="inactive" 
+                                                    style="vertical-align: top; width: 100px; margin: 0px">View Summary</div>
+                                                </div>
+                                            </div>
+                                            <table id="cat-metrics" class="scroll-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Bootstrap probability</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                </tbody>
+                                            </table>
+                                        </th>
+                                        <th style="width: 450px">
+                                            <div style="font-weight: 100; display: inline-block; width: 100%; position: relative; vertical-align: bottom">
+                                                Gene Hits:
+                                                <div class="buttons" style="position: absolute; right: 12px; top: 0px">
+                                                    <div id="clear-gene-hits" class="inactive" style="width: 50px; margin: 0px">Clear</div>
+                                                    <div id="append-gene-hits" class="inactive" style="width: 140px; margin: 0px">Append Selected Genes</div>
+                                                </div>
+                                            </div>
+                                            <table id="cat-hits" class="scroll-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Symbol</th>
+                                                        <th>FlyBase</th>
+                                                        <th>KEGG</th>
+                                                        <th>Bootstrap probability</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                </tbody>
+                                            </table>
+                                        </th>
+                                        <th style="width: 400px">
+                                            <div style="font-weight: 100; display: inline-block; width: 100%; position: relative; vertical-align: bottom">
+                                                All Pathway Genes:
+                                                <div class="buttons" style="position: absolute; right: 12px; top: 0px">
+                                                        <div id="clear-gene-all" class="inactive" style="width: 50px; margin: 0px">Clear</div>
+                                                        <div id="append-gene-all" class="inactive" style="width: 140px; margin: 0px">Append Selected Genes</div>
+                                                    </div>
+                                                </div>
+                                            <table id="cat-genes" class="scroll-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name<br>&nbsp;</th>
+                                                        <th>Symbol</th>
+                                                        <th>FlyBase</th>
+                                                        <th>KEGG</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                </tbody>
+                                            </table>
+                                        </th>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: block; width: 100%; height: 20px; position: absolute; bottom: 0px">
+            <span></span>
+        </div>
+    </body>
+</html>
